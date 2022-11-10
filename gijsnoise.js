@@ -1,85 +1,95 @@
-//Needs to be replaced with my own random number generator. Math.random() doesn't support seeds.
-let seed = Math.random();
+// Perlin Noise
+// Amount of permutations
+const PERMUTATIONS = 512;
 
-//Create an a*b matrix with random values between 0 and 1
-let noiseMatrix = [];
-for(let y = 0;y < 128;y++) {
-    noiseMatrix[y] = [];
-    for(let x = 0;x < 128;x++) {
-        noiseMatrix[y][x] = Math.random();
+permutationTable = generatePermutationTable();
+
+// Vector class
+class Vector {
+    constructor(x,y) {
+        this.x = x;
+        this.y = y;
+    }
+    dot(vector) {
+        return this.x*vector.x + this.y*vector.y;
     }
 }
 
-//Get a value from the noise matrix.
-function getNoiseMatrixValue(x,y) {
-    if(x < 0 || x > noiseMatrix[0].length || y < 0 || y > noiseMatrix.length) return 0;
-    return noiseMatrix[x][y];
+function generatePermutationTable() {
+    let permutationTable = [];
+
+    // Generate permutations [0,PERMUTATIONS]
+    for(let i = 0; i < PERMUTATIONS;i++) {
+        permutationTable[i] = i;
+    }
+
+    // Shuffle permutations
+    permutationTable.sort(() => Math.random() - 0.5);
+
+    for(let i = 0;i < PERMUTATIONS;i++) {
+        permutationTable[PERMUTATIONS + i] = permutationTable[i];
+    }
+    return permutationTable;
 }
 
-//Return a value between 0 and 1 based on x, corresponding to the smootherstep function (a smoothstep function on the second degree S2(x))
-function smootherstep(x) {
-    if(x < 0) return 0;
-    if(x > 1) return 1;
+// General smoothstep function
+function smoothstep(x) {
+    if(x <= 0) return 0;
+    if(x >= 1) return 1;
     return x * x * x * (x * (x * 6 - 15) + 10);
 }
 
-//Interpolate between values a and b using the smootherstep function
+// Final interpolation function
 function interpolate(a,b,x) {
-    return a + (b - a) * smootherstep(x);
+    return a + (b-a)*smoothstep(x);
 }
 
-
-//1D noise function
-function noise(x) {
-    //Get the first y value from the noise matrix using the left side of the noise grid
-    let y1 = getNoiseMatrixValue(0,
-        Math.floor(x)
-    )
-
-    //Get the second y value from the noise matrix using the right side of the noise grid
-    let y2 = getNoiseMatrixValue(0,
-        Math.floor(x) + 1
-    )
-
-    //Normalize x to make sure it is between 0 and 1
-    let normalizedX = x - Math.floor(x);
-
-    return interpolate(y1,y2,normalizedX);
+// Return the corresponding gradient for a permutation
+function generateGradient(permutation) {
+    let p = permutation % 4;
+    switch(p) {
+        case 0:
+            return new Vector(1,1);
+        case 1:
+            return new Vector(-1,1);
+        case 2:
+            return new Vector(-1,-1);
+        case 3:
+            return new Vector(1,-1);
+    }
 }
 
 function noise2D(x,y) {
-    //Top left y-value
-    let yTopLeft = getNoiseMatrixValue(
-        Math.floor(y),
-        Math.floor(x)
-    );
+    // Generate vector gradients for each of the four corners
 
-    //Top right y-value
-    let yTopRight = getNoiseMatrixValue(
-        Math.floor(y),
-        Math.floor(x) + 1
-    )
+    let flooredX = Math.floor(x) % PERMUTATIONS;
+    let flooredY = Math.floor(y) % PERMUTATIONS;
 
-    //Bottom left y-value
-    let yBottomLeft = getNoiseMatrixValue(
-        Math.floor(y) + 1,
-        Math.floor(x)
-    );
+    let topLeftGradient = generateGradient(permutationTable[permutationTable[flooredX] + flooredY + 1]);
+    let topRightGradient = generateGradient(permutationTable[permutationTable[flooredX + 1] + flooredY + 1]);
+    let bottomLeftGradient = generateGradient(permutationTable[permutationTable[flooredX] + flooredY]);
+    let bottomRightGradient = generateGradient(permutationTable[permutationTable[flooredX + 1] + flooredY]);
 
-    //Bottom right y-value
-    let yBottomRight = getNoiseMatrixValue(
-        Math.floor(y) + 1,
-        Math.floor(x) + 1
-    )
-
-    //Normalize x and y to stay on a range from 0 to 1
+    // Calculate the decimals of x and y in [0,1]
     let normalizedX = x - Math.floor(x);
     let normalizedY = y - Math.floor(y);
 
-    //Interpolate the 4 y values on the x-axis
-    let y1 = interpolate(yTopLeft,yTopRight,normalizedX);
-    let y2 = interpolate(yBottomLeft,yBottomRight,normalizedX);
+    // Obtain vectors pointing to (x,y)
+    let vectorTopLeft = new Vector(normalizedX, normalizedY - 1);
+    let vectorTopRight = new Vector(normalizedX - 1, normalizedY - 1);
+    let vectorBottomLeft = new Vector(normalizedX, normalizedY);
+    let vectorBottomRight = new Vector(normalizedX - 1, normalizedY);
 
-    //Return the final interpolated value on the y-axis
-    return interpolate(y1,y2,normalizedY);
+    // Calculate the dot product of the pointing vector and gradient vector
+    let topLeftValue = vectorTopLeft.dot(topLeftGradient);
+    let topRightValue = vectorTopRight.dot(topRightGradient);
+    let bottomLeftValue = vectorBottomLeft.dot(bottomLeftGradient);
+    let bottomRightValue = vectorBottomRight.dot(bottomRightGradient);
+
+    // Obtain both the top and bottom values
+    let topValue = interpolate(topLeftValue,topRightValue,normalizedX);
+    let bottomValue = interpolate(bottomLeftValue,bottomRightValue,normalizedX);
+    
+    // Return the final interpolation between the top and bottom values
+    return interpolate(bottomValue,topValue,normalizedY);
 }

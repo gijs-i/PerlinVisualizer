@@ -57,7 +57,7 @@ function generateTerrainMesh() {
     indices = [];
     for(let x = 0;x < DIMENSIONS;x++) {
         for(let z = 0;z < DIMENSIONS;z++) {
-            plane(x-DIMENSIONS/2,z-DIMENSIONS/2,noiseFreq,noiseHeight);
+            plane(x,z,noiseFreq,noiseHeight);
         }
     }
 }
