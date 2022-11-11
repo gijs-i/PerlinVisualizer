@@ -1,8 +1,6 @@
 // (c) gijs.i
 // Gemaakt behulp van THREE.js
 
-// noise.seed(Math.random());
-
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerWidth, 0.1, 1000 );
 const clock = new THREE.Clock();
