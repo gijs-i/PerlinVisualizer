@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="style.css" rel="stylesheet">
+    <script src="perlin_noise.js"></script>
+    <script src="mouse_input.js"></script>
+    <script src="three.js"></script>
+</head>
+
+<body>
+	<script src="noise_visualizer_2D.js"></script>
+    <div class="menu">
+        <p>Noise frequentie</p>
+        <div class="item">
+            <input type="range" class="slider" id="frequency" min="0" max="0.2" step="0.001" value="0.2">
+            <p id="freqOut">0.2</p>
+        </div>
+        <p>Noise diepte</p>
+        <div class="item">
+            <input type="range" class="slider" id="height" min="0" max="4" step="0.001" value="2">
+            <p id="depthOut">2</p>
+        </div>
+        <p>Translatie-snelheid (x-as)</p>
+        <div class="item">
+            <input type="range" class="slider" id="xPos" min="-0.2" max="0.2" step="0.01" value="0">
+            <p id="xOut">0</p>
+        </div>
+        <p>Translatie-snelheid (y-as)</p>
+        <div class="item">
+            <input type="range" class="slider" id="yPos" min="-0.2" max="0.2" step="0.01" value="0">
+            <p id="yOut">0</p>
+        </div>
+        <p>Visualisatie programma</p>
+        <div class="item">
+            <select id="dropdown">
+                <option value="2D">Noise2D visualisatie</option>
+                <option value="3D">Noise3D visualisatie</option>
+            </select>
+        </div>
+    </div>
+</body>
+
+</html>
