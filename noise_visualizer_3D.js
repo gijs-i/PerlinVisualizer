@@ -16,8 +16,8 @@ let noiseDimensions = 128;
 
 let time = 0;
 
-let noiseFreq = 0.02;
-let noiseThreshhold = 0.5;
+let noiseFreq = 0.025;
+let noiseThreshhold = 0.28;
 let noiseX = 0.0;
 let noiseY = 0.0;
 

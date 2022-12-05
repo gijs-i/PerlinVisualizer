@@ -1,6 +1,6 @@
 // Perlin Noise algorithm made for my PWS
 // Amount of permutations
-const PERMUTATIONS = 128;
+const PERMUTATIONS = 256;
 
 permutationTable = generatePermutationTable();
 
@@ -19,7 +19,7 @@ class Vector3 {
     constructor(x,y,z) {
         this.x = x;
         this.y = y;
-        this.y = y;
+        this.z = z;
     }
     dot(vector) {
         return this.x*vector.x + this.y*vector.y + this.z*vector.z;
@@ -40,6 +40,7 @@ function generatePermutationTable() {
     for(let i = 0;i < PERMUTATIONS;i++) {
         permutationTable[PERMUTATIONS + i] = permutationTable[i];
     }
+
     return permutationTable;
 }
 
@@ -71,7 +72,7 @@ function generateGradient(permutation) {
 }
 
 function generateGradient3(permutation) {
-    let p = permutation % 4;
+    let p = permutation % 8;
     switch(p) {
         case 0:
             return new Vector3(1,1,1);
